@@ -9,11 +9,19 @@ pub fn main() !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
+    const player_texture = try rl.loadTexture("assets/player.png");
+    defer rl.unloadTexture(player_texture);
+
     var scene = Scene{};
 
-    try scene.addEntity(Entity{ .transform = .{
-        .position = .{ .x = 400, .y = 300 },
-    }, .speed = 200.0 });
+    try scene.addEntity(Entity{
+        .transform = .{
+            .position = .{ .x = 400, .y = 300 },
+            .scale = 0.5,
+        },
+        .speed = 200.0,
+        .texture = player_texture,
+    });
 
     try scene.addEntity(Entity{
         .transform = .{
@@ -34,7 +42,7 @@ pub fn main() !void {
         // UPDATE
         const dt = rl.getFrameTime();
 
-        input.processMovement(scene.getEntity(1), dt);
+        input.processMovement(scene.getEntity(0), dt);
 
         // DRAW
         rl.beginDrawing();
@@ -45,6 +53,6 @@ pub fn main() !void {
             renderer.drawEntity(entity);
         }
 
-        renderer.drawDebug(scene.getEntity(1).*);
+        renderer.drawDebug(scene.getEntity(0).*);
     }
 }

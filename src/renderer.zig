@@ -4,11 +4,21 @@ const Entity = @import("entity.zig").Entity;
 pub fn drawEntity(entity: Entity) void {
     if (!entity.active) return;
 
-    rl.drawCircleV(
-        entity.transform.position,
-        32 * entity.transform.scale,
-        rl.Color.sky_blue,
-    );
+    if (entity.texture) |tex| {
+        rl.drawTextureEx(
+            tex,
+            entity.transform.position,
+            entity.transform.rotation,
+            entity.transform.scale,
+            rl.Color.white,
+        );
+    } else {
+        rl.drawCircleV(
+            entity.transform.position,
+            32 * entity.transform.scale,
+            rl.Color.sky_blue,
+        );
+    }
 }
 
 pub fn drawDebug(entity: Entity) void {
