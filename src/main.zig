@@ -3,6 +3,7 @@ const Entity = @import("entity.zig").Entity;
 const input = @import("input.zig");
 const renderer = @import("renderer.zig");
 const Scene = @import("scene.zig").Scene;
+const Camera = @import("camera.zig").Camera;
 
 pub fn main() !void {
     rl.initWindow(800, 600, "My Engine");
@@ -36,6 +37,7 @@ pub fn main() !void {
         },
         .speed = 100.0,
     });
+    var camera = Camera.init(scene.getEntity(0).transform.position);
 
     while (!rl.windowShouldClose()) {
 
@@ -43,15 +45,18 @@ pub fn main() !void {
         const dt = rl.getFrameTime();
 
         input.processMovement(scene.getEntity(0), dt);
+        camera.follow(scene.getEntity(0).*);
 
         // DRAW
         rl.beginDrawing();
         defer rl.endDrawing();
         rl.clearBackground(rl.Color.black);
 
+        camera.begin();
         for (scene.entities[0..scene.count]) |entity| {
             renderer.drawEntity(entity);
         }
+        camera.end();
 
         renderer.drawDebug(scene.getEntity(0).*);
     }
