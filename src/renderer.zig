@@ -1,5 +1,6 @@
 const rl = @import("raylib");
 const Entity = @import("entity.zig").Entity;
+const collision = @import("collision.zig");
 
 pub fn drawEntity(entity: Entity) void {
     if (!entity.active) return;
@@ -19,6 +20,12 @@ pub fn drawEntity(entity: Entity) void {
             rl.Color.sky_blue,
         );
     }
+}
+
+pub fn drawCollider(entity: Entity) void {
+    if (entity.collider == null) return;
+    const rect = collision.getRect(entity);
+    rl.drawRectangleLinesEx(rect, 1, rl.Color.green);
 }
 
 pub fn drawDebug(entity: Entity) void {

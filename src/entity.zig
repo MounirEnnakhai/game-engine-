@@ -6,9 +6,16 @@ pub const Transform = struct {
     scale: f32 = 1,
 };
 
+pub const Collider = struct {
+    width: f32,
+    height: f32,
+    active: bool = true,
+};
+
 pub const Entity = struct {
     transform: Transform,
     speed: f32,
     active: bool = true,
     texture: ?rl.Texture2D = null,
+    collider: ?Collider = null,
 };
