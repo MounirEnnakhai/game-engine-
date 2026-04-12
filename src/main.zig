@@ -12,8 +12,11 @@ pub fn main() !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
-    const player_texture = try rl.loadTexture("assets/player.png");
+    const player_texture = try rl.loadTexture("assets/player11.png");
     defer rl.unloadTexture(player_texture);
+
+    const tex_w = @as(f32, @floatFromInt(player_texture.width));
+    const tex_h = @as(f32, @floatFromInt(player_texture.height));
 
     var scene = Scene{};
 
@@ -25,13 +28,14 @@ pub fn main() !void {
         },
         .speed = 200.0,
         .texture = player_texture,
-        .collider = Collider{ .width = 64, .height = 64 },
+        .collider = Collider{ .width = tex_w, .height = tex_h },
     });
 
     // static entity with collider — solid obstacle
     try scene.addEntity(Entity{
         .transform = .{
             .position = .{ .x = 200, .y = 200 },
+            .scale = 1.0,
         },
         .speed = 0.0,
         .collider = Collider{ .width = 64, .height = 64 },
@@ -41,6 +45,7 @@ pub fn main() !void {
     try scene.addEntity(Entity{
         .transform = .{
             .position = .{ .x = 600, .y = 400 },
+            .scale = 1.0,
         },
         .speed = 0.0,
         .collider = Collider{ .width = 64, .height = 64 },

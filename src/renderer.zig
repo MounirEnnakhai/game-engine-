@@ -6,9 +6,14 @@ pub fn drawEntity(entity: Entity) void {
     if (!entity.active) return;
 
     if (entity.texture) |tex| {
+        const w = @as(f32, @floatFromInt(tex.width)) * entity.transform.scale;
+        const h = @as(f32, @floatFromInt(tex.height)) * entity.transform.scale;
         rl.drawTextureEx(
             tex,
-            entity.transform.position,
+            rl.Vector2{
+                .x = entity.transform.position.x - w / 2.0,
+                .y = entity.transform.position.y - h / 2.0,
+            },
             entity.transform.rotation,
             entity.transform.scale,
             rl.Color.white,

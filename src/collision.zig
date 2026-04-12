@@ -9,11 +9,13 @@ pub fn getRect(entity: Entity) rl.Rectangle {
         .width = 0,
         .height = 0,
     };
+    const w = col.width * entity.transform.scale;
+    const h = col.height * entity.transform.scale;
     return rl.Rectangle{
-        .x = entity.transform.position.x,
-        .y = entity.transform.position.y,
-        .width = col.width * entity.transform.scale,
-        .height = col.height * entity.transform.scale,
+        .x = entity.transform.position.x - w / 2.0,
+        .y = entity.transform.position.y - h / 2.0,
+        .width = w,
+        .height = h,
     };
 }
 
