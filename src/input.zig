@@ -1,12 +1,15 @@
 const rl = @import("raylib");
 const Entity = @import("entity.zig").Entity;
+const physics = @import("physics.zig");
 
 pub fn processMovement(entity: *Entity, dt: f32) void {
     if (!entity.active) return;
 
-    const vel = entity.speed * dt;
-    if (rl.isKeyDown(.right)) entity.transform.position.x += vel;
-    if (rl.isKeyDown(.left)) entity.transform.position.x -= vel;
-    if (rl.isKeyDown(.down)) entity.transform.position.y += vel;
-    if (rl.isKeyDown(.up)) entity.transform.position.y -= vel;
+    entity.velocity.x = 0;
+    if (rl.isKeyDown(.right)) entity.velocity.x += entity.speed;
+    if (rl.isKeyDown(.left)) entity.velocity.x -= entity.speed;
+
+    if (rl.isKeyDown(.up)) physics.jump(entity);
+
+    _ = dt;
 }

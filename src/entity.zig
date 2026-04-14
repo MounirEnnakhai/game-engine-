@@ -15,6 +15,8 @@ pub const Collider = struct {
 pub const Entity = struct {
     transform: Transform,
     speed: f32,
+    velocity: rl.Vector2 = .{ .x = 0, .y = 0 },
+    is_grounded: bool = false,
     active: bool = true,
     texture: ?rl.Texture2D = null,
     collider: ?Collider = null,
