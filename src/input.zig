@@ -6,10 +6,10 @@ pub fn processMovement(entity: *Entity, dt: f32) void {
     if (!entity.active) return;
 
     entity.velocity.x = 0;
-    if (rl.isKeyDown(.right)) entity.velocity.x += entity.speed;
-    if (rl.isKeyDown(.left)) entity.velocity.x -= entity.speed;
+    if (rl.isKeyDown(.d)) entity.velocity.x += entity.speed;
+    if (rl.isKeyDown(.a)) entity.velocity.x -= entity.speed;
 
-    if (rl.isKeyDown(.up)) physics.jump(entity);
+    if (rl.isKeyDown(.space)) physics.jump(entity);
 
     _ = dt;
 }

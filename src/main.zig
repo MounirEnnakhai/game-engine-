@@ -6,6 +6,7 @@ const Camera = @import("camera.zig").Camera;
 const input = @import("input.zig");
 const renderer = @import("renderer.zig");
 const collision = @import("collision.zig");
+const physics = @import("physics.zig");
 
 pub fn main() !void {
     rl.initWindow(800, 600, "My Engine");
@@ -28,6 +29,15 @@ pub fn main() !void {
         },
         .speed = 200.0,
         .texture = player_texture,
+        .collider = Collider{ .width = tex_w, .height = tex_h },
+    });
+
+    try scene.addEntity(Entity{
+        .transform = .{
+            .position = .{ .x = 400, .y = 700 },
+            .scale = 0.5,
+        },
+        .speed = 200.0,
         .collider = Collider{ .width = tex_w, .height = tex_h },
     });
 
@@ -58,7 +68,13 @@ pub fn main() !void {
         // UPDATE
         const dt = rl.getFrameTime();
         input.processMovement(scene.getEntity(0), dt);
+
+        physics.applyGravity(scene.getEntity(0), dt);
+
+        physics.applyVelocity(scene.getEntity(0), dt);
+
         collision.resolveCollision(&scene, 0);
+
         camera.follow(scene.getEntity(0).*);
 
         // DRAW
