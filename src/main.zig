@@ -13,7 +13,7 @@ pub fn main() !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
-    const player_texture = try rl.loadTexture("assets/player11.png");
+    const player_texture = try rl.loadTexture("assets/player01.png");
     defer rl.unloadTexture(player_texture);
 
     const tex_w = @as(f32, @floatFromInt(player_texture.width));
@@ -21,71 +21,75 @@ pub fn main() !void {
 
     var scene = Scene{};
 
-    // player with collider
-    try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 400, .y = 300 },
-            .scale = 0.5,
-        },
-        .speed = 200.0,
-        .texture = player_texture,
-        .collider = Collider{ .width = tex_w, .height = tex_h },
-    });
-
-    try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 400, .y = 700 },
-            .scale = 0.5,
-        },
-        .speed = 200.0,
-        .collider = Collider{ .width = tex_w, .height = tex_h },
-    });
-
-    // static entity with collider — solid obstacle
+    // player
     try scene.addEntity(Entity{
         .transform = .{
             .position = .{ .x = 200, .y = 200 },
-            .scale = 1.0,
+            .scale = 0.3,
         },
-        .speed = 0.0,
-        .collider = Collider{ .width = 64, .height = 64 },
+        .speed = 300.0,
+        .texture = player_texture,
+        .collider = Collider{ .width = tex_w - 50, .height = tex_h },
     });
 
-    // static entity with collider
+    // ground — wide and at the bottom
     try scene.addEntity(Entity{
         .transform = .{
-            .position = .{ .x = 600, .y = 400 },
-            .scale = 1.0,
+            .position = .{ .x = 0, .y = 568 },
         },
         .speed = 0.0,
-        .collider = Collider{ .width = 64, .height = 64 },
+        .collider = Collider{ .width = 3200, .height = 64 },
+        .color = rl.Color{ .r = 34, .g = 139, .b = 34, .a = 255 },
+    });
+
+    // platform 1
+    try scene.addEntity(Entity{
+        .transform = .{
+            .position = .{ .x = 300, .y = 400 },
+        },
+        .speed = 0.0,
+        .collider = Collider{ .width = 200, .height = 32 },
+        .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
+    });
+
+    // platform 2
+    try scene.addEntity(Entity{
+        .transform = .{
+            .position = .{ .x = 600, .y = 300 },
+        },
+        .speed = 0.0,
+        .collider = Collider{ .width = 200, .height = 32 },
+        .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
+    });
+
+    // platform 3
+    try scene.addEntity(Entity{
+        .transform = .{
+            .position = .{ .x = 900, .y = 400 },
+        },
+        .speed = 0.0,
+        .collider = Collider{ .width = 200, .height = 32 },
+        .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
     });
 
     var camera = Camera.init(scene.getEntity(0).transform.position);
 
     while (!rl.windowShouldClose()) {
-
-        // UPDATE
         const dt = rl.getFrameTime();
+
         input.processMovement(scene.getEntity(0), dt);
-
         physics.applyGravity(scene.getEntity(0), dt);
-
         physics.applyVelocity(scene.getEntity(0), dt);
-
         collision.resolveCollision(&scene, 0);
-
         camera.follow(scene.getEntity(0).*);
 
-        // DRAW
         rl.beginDrawing();
         defer rl.endDrawing();
-        rl.clearBackground(rl.Color.black);
+        rl.clearBackground(rl.Color{ .r = 30, .g = 30, .b = 30, .a = 255 });
 
         camera.begin();
         for (scene.entities[0..scene.count]) |entity| {
             renderer.drawEntity(entity);
-            renderer.drawCollider(entity);
         }
         camera.end();
 

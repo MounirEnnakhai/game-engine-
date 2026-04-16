@@ -3,7 +3,7 @@ const rl = @import("raylib");
 pub const Transform = struct {
     position: rl.Vector2,
     rotation: f32 = 0.0,
-    scale: f32 = 1,
+    scale: f32 = 1.0,
 };
 
 pub const Collider = struct {
@@ -18,6 +18,7 @@ pub const Entity = struct {
     velocity: rl.Vector2 = .{ .x = 0, .y = 0 },
     is_grounded: bool = false,
     active: bool = true,
-    texture: ?rl.Texture2D = null,
+    texture: ?rl.Texture = null,
     collider: ?Collider = null,
+    color: rl.Color = rl.Color.sky_blue,
 };

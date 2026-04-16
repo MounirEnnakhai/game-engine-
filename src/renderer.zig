@@ -19,11 +19,8 @@ pub fn drawEntity(entity: Entity) void {
             rl.Color.white,
         );
     } else {
-        rl.drawCircleV(
-            entity.transform.position,
-            32 * entity.transform.scale,
-            rl.Color.sky_blue,
-        );
+        const rect = collision.getRect(entity);
+        rl.drawRectangleRec(rect, entity.color);
     }
 }
 
