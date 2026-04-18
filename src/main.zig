@@ -1,6 +1,7 @@
 const rl = @import("raylib");
 const Entity = @import("entity.zig").Entity;
 const Collider = @import("entity.zig").Collider;
+const Animation = @import("animator.zig").Animation;
 const Scene = @import("scene.zig").Scene;
 const Camera = @import("camera.zig").Camera;
 const input = @import("input.zig");
@@ -13,11 +14,11 @@ pub fn main() !void {
     defer rl.closeWindow();
     rl.setTargetFPS(60);
 
-    const player_texture = try rl.loadTexture("assets/player01.png");
-    defer rl.unloadTexture(player_texture);
+    const run_texture = try rl.loadTexture("assets/RUN.png");
+    defer rl.unloadTexture(run_texture);
 
-    const tex_w = @as(f32, @floatFromInt(player_texture.width));
-    const tex_h = @as(f32, @floatFromInt(player_texture.height));
+    const idle_texture = try rl.loadTexture("assets/IDLE.png");
+    defer rl.unloadTexture(idle_texture);
 
     var scene = Scene{};
 
@@ -25,18 +26,25 @@ pub fn main() !void {
     try scene.addEntity(Entity{
         .transform = .{
             .position = .{ .x = 200, .y = 200 },
-            .scale = 0.3,
+            .scale = 2.0,
         },
         .speed = 300.0,
-        .texture = player_texture,
-        .collider = Collider{ .width = tex_w - 50, .height = tex_h },
+        .collider = Collider{
+            .width = @as(f32, @floatFromInt(idle_texture.width)) / 10.0,
+            .height = @as(f32, @floatFromInt(idle_texture.height)),
+        },
+        .animator = Animation{
+            .texture = idle_texture,
+            .frame_width = @as(f32, @floatFromInt(idle_texture.width)) / 10.0,
+            .frame_height = @as(f32, @floatFromInt(idle_texture.height)),
+            .frame_count = 10,
+            .frame_speed = 0.08,
+        },
     });
 
-    // ground — wide and at the bottom
+    // ground
     try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 0, .y = 568 },
-        },
+        .transform = .{ .position = .{ .x = 0, .y = 568 } },
         .speed = 0.0,
         .collider = Collider{ .width = 3200, .height = 64 },
         .color = rl.Color{ .r = 34, .g = 139, .b = 34, .a = 255 },
@@ -44,9 +52,7 @@ pub fn main() !void {
 
     // platform 1
     try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 300, .y = 400 },
-        },
+        .transform = .{ .position = .{ .x = 300, .y = 400 } },
         .speed = 0.0,
         .collider = Collider{ .width = 200, .height = 32 },
         .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
@@ -54,9 +60,7 @@ pub fn main() !void {
 
     // platform 2
     try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 600, .y = 300 },
-        },
+        .transform = .{ .position = .{ .x = 600, .y = 300 } },
         .speed = 0.0,
         .collider = Collider{ .width = 200, .height = 32 },
         .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
@@ -64,24 +68,63 @@ pub fn main() !void {
 
     // platform 3
     try scene.addEntity(Entity{
-        .transform = .{
-            .position = .{ .x = 900, .y = 400 },
-        },
+        .transform = .{ .position = .{ .x = 900, .y = 400 } },
         .speed = 0.0,
         .collider = Collider{ .width = 200, .height = 32 },
         .color = rl.Color{ .r = 139, .g = 90, .b = 43, .a = 255 },
     });
 
+    // store both animations separately
+    const run_anim = Animation{
+        .texture = run_texture,
+        .frame_width = @as(f32, @floatFromInt(run_texture.width)) / 16.0,
+        .frame_height = @as(f32, @floatFromInt(run_texture.height)),
+        .frame_count = 16,
+        .frame_speed = 0.06,
+    };
+
+    const idle_anim = Animation{
+        .texture = idle_texture,
+        .frame_width = @as(f32, @floatFromInt(idle_texture.width)) / 10.0,
+        .frame_height = @as(f32, @floatFromInt(idle_texture.height)),
+        .frame_count = 10,
+        .frame_speed = 0.08,
+    };
+
     var camera = Camera.init(scene.getEntity(0).transform.position);
+    var is_running = false;
 
     while (!rl.windowShouldClose()) {
         const dt = rl.getFrameTime();
+        const player = scene.getEntity(0);
 
-        input.processMovement(scene.getEntity(0), dt);
-        physics.applyGravity(scene.getEntity(0), dt);
-        physics.applyVelocity(scene.getEntity(0), dt);
+        input.processMovement(player, dt);
+        physics.applyGravity(player, dt);
+        physics.applyVelocity(player, dt);
         collision.resolveCollision(&scene, 0);
-        camera.follow(scene.getEntity(0).*);
+        camera.follow(player.*);
+
+        // switch animation based on movement
+        const moving = player.velocity.x != 0;
+
+        if (moving and !is_running) {
+            // switched to running
+            is_running = true;
+            const flip = if (player.animator != null) player.animator.?.flip_x else false;
+            player.animator = run_anim;
+            player.animator.?.flip_x = flip;
+        } else if (!moving and is_running) {
+            // switched to idle
+            is_running = false;
+            const flip = if (player.animator != null) player.animator.?.flip_x else false;
+            player.animator = idle_anim;
+            player.animator.?.flip_x = flip;
+        }
+
+        // update animation
+        if (player.animator != null) {
+            player.animator.?.update(dt);
+        }
 
         rl.beginDrawing();
         defer rl.endDrawing();
@@ -90,6 +133,7 @@ pub fn main() !void {
         camera.begin();
         for (scene.entities[0..scene.count]) |entity| {
             renderer.drawEntity(entity);
+            renderer.drawCollider(entity);
         }
         camera.end();
 

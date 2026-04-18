@@ -1,4 +1,5 @@
 const rl = @import("raylib");
+const Animation = @import("animator.zig").Animation;
 
 pub const Transform = struct {
     position: rl.Vector2,
@@ -21,4 +22,5 @@ pub const Entity = struct {
     texture: ?rl.Texture = null,
     collider: ?Collider = null,
     color: rl.Color = rl.Color.sky_blue,
+    animator: ?Animation = null,
 };

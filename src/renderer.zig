@@ -5,7 +5,11 @@ const collision = @import("collision.zig");
 pub fn drawEntity(entity: Entity) void {
     if (!entity.active) return;
 
-    if (entity.texture) |tex| {
+    if (entity.animator) |anim| {
+        // has animator — draw current animation frame
+        anim.draw(entity.transform.position, entity.transform.scale);
+    } else if (entity.texture) |tex| {
+        // has static texture
         const w = @as(f32, @floatFromInt(tex.width)) * entity.transform.scale;
         const h = @as(f32, @floatFromInt(tex.height)) * entity.transform.scale;
         rl.drawTextureEx(
@@ -19,6 +23,7 @@ pub fn drawEntity(entity: Entity) void {
             rl.Color.white,
         );
     } else {
+        // fallback — colored rectangle
         const rect = collision.getRect(entity);
         rl.drawRectangleRec(rect, entity.color);
     }
