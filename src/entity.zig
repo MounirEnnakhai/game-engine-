@@ -10,6 +10,8 @@ pub const Transform = struct {
 pub const Collider = struct {
     width: f32,
     height: f32,
+    offset_x: f32 = 0.0,
+    offset_y: f32 = 0.0,
     active: bool = true,
 };
 

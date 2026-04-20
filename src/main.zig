@@ -30,8 +30,9 @@ pub fn main() !void {
         },
         .speed = 300.0,
         .collider = Collider{
-            .width = @as(f32, @floatFromInt(idle_texture.width)) / 10.0,
-            .height = @as(f32, @floatFromInt(idle_texture.height)),
+            .width = 32,
+            .height = 38,
+            .offset_y = 30.0,
         },
         .animator = Animation{
             .texture = idle_texture,

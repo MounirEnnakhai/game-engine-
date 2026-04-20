@@ -12,8 +12,8 @@ pub fn getRect(entity: Entity) rl.Rectangle {
     const w = col.width * entity.transform.scale;
     const h = col.height * entity.transform.scale;
     return rl.Rectangle{
-        .x = entity.transform.position.x - w / 2.0,
-        .y = entity.transform.position.y - h / 2.0,
+        .x = entity.transform.position.x - w / 2.0 + col.offset_x,
+        .y = entity.transform.position.y - h / 2.0 + col.offset_y,
         .width = w,
         .height = h,
     };
